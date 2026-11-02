@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("BUYER")
+  location     String?
+  phone        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  products         Product[]
+  purchaseRequests PurchaseRequest[]
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  quantity    Float
+  unit        String
+  active      Boolean  @default(true)
+  location    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  producerId String
+  producer   User   @relation(fields: [producerId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  purchaseRequests PurchaseRequest[]
+}
+
+model PurchaseRequest {
+  id                 String   @id @default(cuid())
+  quantity           Float
+  unitPriceAtRequest Float
+  status             String   @default("PENDING")
+  origin             String?
+  destination        String?
+  transportType      String?
+  notes              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  buyerId String
+  buyer   User   @relation(fields: [buyerId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
