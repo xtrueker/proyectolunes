@@ -1,9 +1,10 @@
-import express from "express";
+﻿import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { prisma } from "./prisma.js";
 import productsRouter from "./routes/products.js";
 import purchaseRequestsRouter from "./routes/purchaseRequests.js";
+import authRouter from "./routes/auth.js";
 
 dotenv.config();
 
@@ -12,6 +13,8 @@ const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/api/auth", authRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/purchase-requests", purchaseRequestsRouter);
 
@@ -66,17 +69,9 @@ app.get("/api/categories", async (req, res) => {
 // Obtener catálogo de productos con búsqueda y filtros.
 app.get("/api/products", async (req, res) => {
   try {
-    const {
-      search,
-      categoryId,
-      location,
-      minPrice,
-      maxPrice,
-    } = req.query;
+    const { search, categoryId, location, minPrice, maxPrice } = req.query;
 
-    const where = {
-      active: true,
-    };
+    const where = { active: true };
 
     if (search) {
       where.OR = [
@@ -85,13 +80,8 @@ app.get("/api/products", async (req, res) => {
       ];
     }
 
-    if (categoryId) {
-      where.categoryId = categoryId;
-    }
-
-    if (location) {
-      where.location = { contains: location };
-    }
+    if (categoryId) where.categoryId = categoryId;
+    if (location) where.location = { contains: location };
 
     if (minPrice !== undefined || maxPrice !== undefined) {
       where.price = {};
@@ -135,16 +125,10 @@ app.get("/api/products", async (req, res) => {
       include: {
         category: true,
         producer: {
-          select: {
-            id: true,
-            name: true,
-            location: true,
-          },
+          select: { id: true, name: true, location: true },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
 
     res.json({
@@ -154,7 +138,6 @@ app.get("/api/products", async (req, res) => {
     });
   } catch (error) {
     console.error("Error al consultar productos:", error);
-
     res.status(500).json({
       success: false,
       message: "No se pudo consultar el catálogo",
@@ -166,17 +149,11 @@ app.get("/api/products", async (req, res) => {
 app.get("/api/products/:id", async (req, res) => {
   try {
     const product = await prisma.product.findUnique({
-      where: {
-        id: req.params.id,
-      },
+      where: { id: req.params.id },
       include: {
         category: true,
         producer: {
-          select: {
-            id: true,
-            name: true,
-            location: true,
-          },
+          select: { id: true, name: true, location: true },
         },
       },
     });
@@ -188,13 +165,9 @@ app.get("/api/products/:id", async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      data: product,
-    });
+    res.json({ success: true, data: product });
   } catch (error) {
     console.error("Error al consultar el producto:", error);
-
     res.status(500).json({
       success: false,
       message: "No se pudo consultar el producto",
@@ -206,7 +179,6 @@ const server = app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
 
-// Cerrar las conexiones de forma ordenada al detener el servidor.
 function shutdown() {
   server.close(async () => {
     await prisma.$disconnect();
