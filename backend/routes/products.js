@@ -5,6 +5,7 @@ import {
   authenticateToken,
   authorizeRoles,
 } from "../middleware/auth.js";
+import { buildProductFilters } from "../utils/productFilters.js";
 
 const router = Router();
 
