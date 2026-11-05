@@ -1,4 +1,5 @@
-﻿import { Router } from "express";
+﻿
+import { Router } from "express";
 import { prisma } from "../prisma.js";
 import {
   authenticateToken,
@@ -18,19 +19,65 @@ const productInclude = {
   },
 };
 
-// GET: catálogo público.
+// GET: catálogo público con búsqueda y filtros.
 router.get("/", async (req, res) => {
   try {
-    const { search, categoryId } = req.query;
+    const { search, categoryId, location, minPrice, maxPrice } = req.query;
+    const where = { active: true };
+
+    if (search) {
+      where.OR = [
+        { name: { contains: String(search) } },
+        { description: { contains: String(search) } },
+      ];
+    }
+
+    if (categoryId) where.categoryId = String(categoryId);
+    if (location) where.location = { contains: String(location) };
+
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      where.price = {};
+
+      if (minPrice !== undefined) {
+        const value = Number(minPrice);
+
+        if (!Number.isFinite(value) || value < 0) {
+          return res.status(400).json({
+            success: false,
+            message: "El precio mínimo no es válido.",
+          });
+        }
+
+        where.price.gte = value;
+      }
+
+      if (maxPrice !== undefined) {
+        const value = Number(maxPrice);
+
+        if (!Number.isFinite(value) || value < 0) {
+          return res.status(400).json({
+            success: false,
+            message: "El precio máximo no es válido.",
+          });
+        }
+
+        where.price.lte = value;
+      }
+
+      if (
+        where.price.gte !== undefined &&
+        where.price.lte !== undefined &&
+        where.price.gte > where.price.lte
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "El precio mínimo no puede superar el máximo.",
+        });
+      }
+    }
 
     const products = await prisma.product.findMany({
-      where: {
-        active: true,
-        ...(categoryId ? { categoryId: String(categoryId) } : {}),
-        ...(search
-          ? { name: { contains: String(search) } }
-          : {}),
-      },
+      where,
       include: productInclude,
       orderBy: { createdAt: "desc" },
     });
@@ -42,6 +89,7 @@ router.get("/", async (req, res) => {
     });
   } catch (error) {
     console.error("Error al consultar productos:", error);
+
     return res.status(500).json({
       success: false,
       message: "No se pudo consultar el catálogo.",
@@ -67,6 +115,7 @@ router.get("/:id", async (req, res) => {
     return res.json({ success: true, data: product });
   } catch (error) {
     console.error("Error al consultar producto:", error);
+
     return res.status(500).json({
       success: false,
       message: "No se pudo consultar el producto.",
@@ -102,7 +151,8 @@ router.post(
       ) {
         return res.status(400).json({
           success: false,
-          message: "Nombre, precio, cantidad, unidad y categoría son obligatorios.",
+          message:
+            "Nombre, precio, cantidad, unidad y categoría son obligatorios.",
         });
       }
 
@@ -155,6 +205,7 @@ router.post(
       });
     } catch (error) {
       console.error("Error al crear producto:", error);
+
       return res.status(500).json({
         success: false,
         message: "No se pudo crear el producto.",
@@ -207,6 +258,7 @@ router.put(
             message: "El nombre no es válido.",
           });
         }
+
         data.name = name.trim();
       }
 
@@ -217,28 +269,33 @@ router.put(
             message: "La descripción no es válida.",
           });
         }
+
         data.description = description.trim() || null;
       }
 
       if (price !== undefined) {
         const value = Number(price);
+
         if (!Number.isFinite(value) || value <= 0) {
           return res.status(400).json({
             success: false,
             message: "El precio debe ser mayor que cero.",
           });
         }
+
         data.price = value;
       }
 
       if (quantity !== undefined) {
         const value = Number(quantity);
+
         if (!Number.isFinite(value) || value <= 0) {
           return res.status(400).json({
             success: false,
             message: "La cantidad debe ser mayor que cero.",
           });
         }
+
         data.quantity = value;
       }
 
@@ -249,6 +306,7 @@ router.put(
             message: "La unidad no es válida.",
           });
         }
+
         data.unit = unit.trim();
       }
 
@@ -263,6 +321,7 @@ router.put(
             message: "La categoría seleccionada no existe.",
           });
         }
+
         data.categoryId = String(categoryId);
       }
 
@@ -273,6 +332,7 @@ router.put(
             message: "La ubicación no es válida.",
           });
         }
+
         data.location = location.trim() || null;
       }
 
@@ -296,6 +356,7 @@ router.put(
       });
     } catch (error) {
       console.error("Error al actualizar producto:", error);
+
       return res.status(500).json({
         success: false,
         message: "No se pudo actualizar el producto.",
@@ -348,6 +409,7 @@ router.patch(
       });
     } catch (error) {
       console.error("Error al desactivar producto:", error);
+
       return res.status(500).json({
         success: false,
         message: "No se pudo desactivar el producto.",
