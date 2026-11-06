@@ -5,7 +5,7 @@ import {
   authorizeRoles,
 } from "../middleware/auth.js";
 
-constrouter = Router();
+const router = Router();
 
 const requestInclude = {
   buyer: {
