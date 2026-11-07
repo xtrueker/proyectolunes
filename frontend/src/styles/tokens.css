@@ -1,0 +1,48 @@
+/* Tokens de diseño de Agro-Red Magdalena.
+   Verdes profundos y suaves, crema y acentos cálidos (caléndula y cacao). */
+:root {
+  /* Verdes */
+  --pine-deep: #0c2219;
+  --pine: #143528;
+  --pine-mid: #24543f;
+  --moss: #5f8a3e;
+  --leaf: #9dbd6f;
+  --sage: #dfe8cf;
+  --sage-light: #eef2e2;
+
+  /* Neutros cálidos */
+  --cream: #f7f3e6;
+  --cream-deep: #efe8d3;
+  --paper: #fffdf6;
+  --line: #e2dbc5;
+  --line-strong: #cbc3a8;
+
+  /* Acentos cálidos */
+  --marigold: #e0a12c;
+  --marigold-soft: #f8e7bd;
+  --cacao: #6b4a2f;
+
+  /* Texto */
+  --ink: #1a2a22;
+  --ink-2: #3f5147;
+  --ink-3: #566a5e;
+
+  /* Semánticos */
+  --danger: #a8362b;
+  --danger-soft: #f7dedb;
+  --info-soft: #dcebf1;
+
+  /* Tipografía */
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Forma y profundidad */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --shadow-1: 0 1px 2px rgba(20, 53, 40, 0.06), 0 6px 16px rgba(20, 53, 40, 0.06);
+  --shadow-2: 0 18px 44px rgba(12, 34, 25, 0.22);
+
+  --header-h: 72px;
+}
