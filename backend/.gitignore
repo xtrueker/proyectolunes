@@ -3,3 +3,14 @@ node_modules
 .env
 
 /generated/prisma
+
+# Archivos auxiliares locales
+.agents/
+skills-lock.json
+
+# Configuraciones y habilidades locales de asistentes
+.claude/
+.windsurf/
+
+# Scripts locales de consulta
+consultar-demo.js
