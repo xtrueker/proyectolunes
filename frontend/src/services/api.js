@@ -57,7 +57,7 @@ export async function apiRequest(endpoint, options = {}) {
     throw networkError;
   }
 
-  let result = null;
+  let result;
 
   try {
     result = await response.json();

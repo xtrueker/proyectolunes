@@ -23,58 +23,13 @@ const productInclude = {
 // GET: catálogo público con búsqueda y filtros.
 router.get("/", async (req, res) => {
   try {
-    const { search, categoryId, location, minPrice, maxPrice } = req.query;
-    const where = { active: true };
+    const { where, error } = buildProductFilters(req.query);
 
-    if (search) {
-      where.OR = [
-        { name: { contains: String(search) } },
-        { description: { contains: String(search) } },
-      ];
-    }
-
-    if (categoryId) where.categoryId = String(categoryId);
-    if (location) where.location = { contains: String(location) };
-
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      where.price = {};
-
-      if (minPrice !== undefined) {
-        const value = Number(minPrice);
-
-        if (!Number.isFinite(value) || value < 0) {
-          return res.status(400).json({
-            success: false,
-            message: "El precio mínimo no es válido.",
-          });
-        }
-
-        where.price.gte = value;
-      }
-
-      if (maxPrice !== undefined) {
-        const value = Number(maxPrice);
-
-        if (!Number.isFinite(value) || value < 0) {
-          return res.status(400).json({
-            success: false,
-            message: "El precio máximo no es válido.",
-          });
-        }
-
-        where.price.lte = value;
-      }
-
-      if (
-        where.price.gte !== undefined &&
-        where.price.lte !== undefined &&
-        where.price.gte > where.price.lte
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: "El precio mínimo no puede superar el máximo.",
-        });
-      }
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error,
+      });
     }
 
     const products = await prisma.product.findMany({
@@ -188,11 +143,14 @@ router.post(
       const product = await prisma.product.create({
         data: {
           name: name.trim(),
-          description: description?.trim() || null,
+          description: typeof description === "string" ? description.trim() : "",
           price: numericPrice,
           quantity: numericQuantity,
           unit: unit.trim(),
-          location: location?.trim() || req.user.location || null,
+          location:
+            typeof location === "string" && location.trim()
+              ? location.trim()
+              : req.user.location || null,
           categoryId: String(categoryId),
           producerId: req.user.id,
         },
@@ -271,7 +229,7 @@ router.put(
           });
         }
 
-        data.description = description.trim() || null;
+        data.description = description.trim();
       }
 
       if (price !== undefined) {

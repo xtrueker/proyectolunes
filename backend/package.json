@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --check server.js && node --check routes/auth.js && node --check routes/products.js && node --check routes/purchaseRequests.js",
+    "test": "node --check server.js && node --check routes/auth.js && node --check routes/products.js && node --check routes/purchaseRequests.js && node --test",
     "start": "node server.js",
     "dev": "nodemon server.js",
     "db:seed": "node seed.js",

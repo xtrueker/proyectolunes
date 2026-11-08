@@ -26,9 +26,10 @@ export const authApi = {
 
 export const catalogApi = {
   categories: () => apiRequest("/categories"),
-  // El backend solo filtra por `search` (nombre) y `categoryId`.
-  products: ({ search, categoryId } = {}) =>
-    apiRequest(`/products${toQuery({ search, categoryId })}`),
+  products: ({ search, categoryId, location, minPrice, maxPrice } = {}) =>
+    apiRequest(
+      `/products${toQuery({ search, categoryId, location, minPrice, maxPrice })}`
+    ),
   product: (id) => apiRequest(`/products/${encodeURIComponent(id)}`),
   createProduct: (data) => apiRequest("/products", json("POST", data)),
   updateProduct: (id, data) =>
