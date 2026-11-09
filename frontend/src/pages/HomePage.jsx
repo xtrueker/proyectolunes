@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import CategoryArt from "../components/CategoryArt";
 import { EmptyState, ErrorState, ProductGridSkeleton } from "../components/Feedback";
@@ -8,20 +7,28 @@ import ProductCard from "../components/ProductCard";
 import { useAuth } from "../context/useAuth";
 import useApi from "../hooks/useApi";
 import usePageTitle from "../hooks/usePageTitle";
-import { catalogApi } from "../services/agroApi";
+import { catalogApi, logisticsApi, poolsApi } from "../services/agroApi";
 
-const STEPS = [
+const INNOVATION_PILLARS = [
   {
-    title: "Encuentra tu producto",
-    text: "Busca por nombre o por categoría y revisa precio, existencias y ubicación.",
+    icon: "route",
+    title: "Gemelo Logístico del Río Magdalena",
+    text: "Compara rutas fluviales, terrestres e híbridas ajustando caudal (estiaje/creciente), riesgo de merma y ahorro de CO₂.",
   },
   {
-    title: "Envía tu solicitud",
-    text: "Indica cantidad, origen, destino y si el transporte será terrestre o fluvial.",
+    icon: "users",
+    title: "Consolidación Colaborativa (Pools)",
+    text: "Agrupa cosechas de distintos productores en ventanas de 48 h para prorratear el costo del planchón o camión.",
   },
   {
-    title: "El productor responde",
-    text: "Acepta o rechaza tu solicitud. Al aceptar, el inventario se actualiza solo.",
+    icon: "shield",
+    title: "Pago Protegido Escrow 30 / 70",
+    text: "Custodia el pago y libera 30 % automático al verificar embarque en puerto y 70 % contra entrega en destino.",
+  },
+  {
+    icon: "spark",
+    title: "Precio Justo SIPSA y Voz Rural",
+    text: "Publica dictando con micrófono y compara tu ganancia directa frente al intermediario tradicional y centrales mayoristas.",
   },
 ];
 
@@ -29,26 +36,29 @@ export default function HomePage() {
   usePageTitle("");
 
   const { user } = useAuth();
-  const [photoLoaded, setPhotoLoaded] = useState(false);
   const categories = useApi(() => catalogApi.categories(), []);
   const products = useApi(() => catalogApi.products(), []);
+  const nodes = useApi(() => logisticsApi.nodes(), []);
+  const pools = useApi(() => poolsApi.available(), []);
 
   const latest = (products.data || []).slice(0, 6);
+  const totalNodes = (nodes.data || []).length || 10;
+  const openPoolsCount = (pools.data || []).length;
+  const activeProductsCount = (products.data || []).length;
 
-  let sellLink = (
-    <Link to="/registro?rol=PRODUCER" className="btn btn-secondary btn-lg">
-      Vender mis productos
+  let secondaryCta = (
+    <Link to="/logistica" className="btn btn-secondary btn-lg">
+      <Icon name="route" size={18} />
+      Simular rutas y pools
     </Link>
   );
 
   if (user?.role === "PRODUCER") {
-    sellLink = (
+    secondaryCta = (
       <Link to="/panel" className="btn btn-secondary btn-lg">
         Ir a mi panel
       </Link>
     );
-  } else if (user) {
-    sellLink = null;
   }
 
   return (
@@ -57,77 +67,92 @@ export default function HomePage() {
         <div className="container">
           <div className="hero-card">
             <div className="hero-copy">
+              <span className="hero-eyebrow">
+                <Icon name="anchor" size={15} />
+                PLATAFORMA MULTIMODAL B2B · MAGDALENA MEDIO
+              </span>
+
               <h1>Compra directo a quienes cultivan en el Magdalena Medio</h1>
               <p className="hero-lead">
-                Explora el catálogo, envía una solicitud con tu destino y tipo
-                de transporte, y recibe la respuesta del productor.
+                Conectamos pequeños productores agrícolas, ganaderos y pesqueros
+                con compradores mayoristas optimizando rutas fluviales, terrestres
+                y despachos consolidados sin intermediarios.
               </p>
 
               <div className="button-row">
                 <Link to="/catalogo" className="btn btn-primary btn-lg">
                   Explorar el catálogo
                 </Link>
-                {sellLink}
+                {secondaryCta}
               </div>
 
               <ul className="hero-points">
                 <li>
                   <Icon name="check" size={18} />
-                  Transporte terrestre o fluvial
+                  Ruteo vivo Río Magdalena + Carretera con ahorro de CO₂
                 </li>
                 <li>
                   <Icon name="check" size={18} />
-                  El productor confirma el precio final
+                  Negociación directa, contraofertas y referencia SIPSA-DANE
                 </li>
                 <li>
                   <Icon name="check" size={18} />
-                  Inventario que se actualiza al aceptar
+                  Garantía Escrow liberada por hitos verificados con fotografía
                 </li>
               </ul>
             </div>
 
             <div className="hero-visual">
               <HeroArt />
-              {/* Foto opcional: copia tu imagen a public/images/hero.jpg */}
-              <img
-                className={`hero-photo ${photoLoaded ? "is-loaded" : ""}`}
-                src="/images/hero.jpg"
-                alt="Paisaje agrícola del Magdalena Medio"
-                onLoad={() => setPhotoLoaded(true)}
-              />
             </div>
           </div>
+
+          <dl className="hero-metrics" aria-label="Indicadores en vivo de la red">
+            <div>
+              <dt>Puertos y nodos activos</dt>
+              <dd>{totalNodes}</dd>
+            </div>
+            <div>
+              <dt>Lotes publicados</dt>
+              <dd>{products.loading ? "–" : activeProductsCount}</dd>
+            </div>
+            <div>
+              <dt>Pools abiertos hoy</dt>
+              <dd>{pools.loading ? "–" : openPoolsCount}</dd>
+            </div>
+            <div>
+              <dt>Garantía por hitos</dt>
+              <dd>30% / 70%</dd>
+            </div>
+          </dl>
         </div>
       </section>
 
       <section className="section container">
-        <div className="section-head">
-          <h2>Explora por categoría</h2>
-          <p>Cada categoría reúne los productos publicados por los productores.</p>
+        <div className="section-head row-between">
+          <div>
+            <h2>Innovación aplicada al campo regional</h2>
+            <p>
+              Tecnología diseñada para resolver costos de transporte, asimetría de
+              precios y confianza comercial.
+            </p>
+          </div>
+          <Link to="/logistica" className="btn btn-secondary">
+            Abrir Gemelo Logístico
+          </Link>
         </div>
 
-        {categories.loading ? (
-          <div className="category-grid" aria-busy="true">
-            {Array.from({ length: 8 }, (_, i) => (
-              <div className="skeleton skeleton-tile" key={i} />
-            ))}
-          </div>
-        ) : categories.error ? (
-          <ErrorState message={categories.error} onRetry={categories.reload} />
-        ) : (
-          <div className="category-grid">
-            {(categories.data || []).map((category) => (
-              <Link
-                key={category.id}
-                to={`/catalogo?categoryId=${category.id}`}
-                className="category-tile"
-              >
-                <CategoryArt name={category.name} />
-                <span>{category.name}</span>
-              </Link>
-            ))}
-          </div>
-        )}
+        <div className="pillars-grid">
+          {INNOVATION_PILLARS.map((pillar) => (
+            <article key={pillar.title} className="pillar-card">
+              <span className="pillar-icon">
+                <Icon name={pillar.icon} size={22} />
+              </span>
+              <h3>{pillar.title}</h3>
+              <p>{pillar.text}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="section section-tint">
@@ -135,7 +160,7 @@ export default function HomePage() {
           <div className="section-head row-between">
             <div>
               <h2>Publicados recientemente</h2>
-              <p>Los productos más nuevos del catálogo.</p>
+              <p>Oferta directa desde puertos ribereños y centros de acopio.</p>
             </div>
             <Link to="/catalogo" className="btn btn-secondary">
               Ver todo el catálogo
@@ -162,17 +187,32 @@ export default function HomePage() {
 
       <section className="section container">
         <div className="section-head">
-          <h2>Cómo funciona una compra</h2>
+          <h2>Explora por categoría agropecuaria</h2>
+          <p>Selecciona un sector productivo para filtrar el catálogo regional.</p>
         </div>
 
-        <ol className="steps">
-          {STEPS.map((step) => (
-            <li key={step.title}>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </li>
-          ))}
-        </ol>
+        {categories.loading ? (
+          <div className="category-grid" aria-busy="true">
+            {Array.from({ length: 8 }, (_, i) => (
+              <div className="skeleton skeleton-tile" key={i} />
+            ))}
+          </div>
+        ) : categories.error ? (
+          <ErrorState message={categories.error} onRetry={categories.reload} />
+        ) : (
+          <div className="category-grid">
+            {(categories.data || []).map((category) => (
+              <Link
+                key={category.id}
+                to={`/catalogo?categoryId=${category.id}`}
+                className="category-tile"
+              >
+                <CategoryArt name={category.name} />
+                <span>{category.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {user?.role !== "BUYER" && (
@@ -181,8 +221,8 @@ export default function HomePage() {
             <div>
               <h2>¿Produces en el Magdalena Medio?</h2>
               <p>
-                Publica tus productos, controla tu inventario y responde las
-                solicitudes de compra desde un solo panel.
+                Publica dictando por voz, consulta precios de referencia SIPSA y
+                despacha consolidando carga fluvial o terrestre.
               </p>
             </div>
             <Link

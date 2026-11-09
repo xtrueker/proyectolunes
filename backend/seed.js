@@ -1,14 +1,10 @@
-
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
-import { PrismaClient } from "./generated/prisma/client.ts";
-
-const adapter = new PrismaLibSql({
-  url: process.env.DATABASE_URL,
-});
-
-const prisma = new PrismaClient({ adapter });
+import { prisma } from "./prisma.js";
+import {
+  ensurePhase2Schema,
+  seedLogisticsNetwork,
+} from "./utils/ensurePhase2Schema.js";
 
 const categories = [
   "Frutas",
@@ -23,6 +19,13 @@ const categories = [
 
 async function main() {
   console.log("Iniciando carga de datos...");
+
+  await ensurePhase2Schema(prisma);
+  const nodesByName = await seedLogisticsNetwork(prisma);
+  const barrancaNode = nodesByName.get("Barrancabermeja") || null;
+  const cantagalloNode = nodesByName.get("Cantagallo") || null;
+  const wilchesNode = nodesByName.get("Puerto Wilches") || null;
+  const bucaramangaNode = nodesByName.get("Bucaramanga") || null;
 
   // 1. Crear categorías sin duplicarlas.
   for (const name of categories) {
@@ -40,7 +43,9 @@ async function main() {
     where: {
       email: "productor@agrored.local",
     },
-    update: {},
+    update: {
+      originNodeId: barrancaNode?.id || null,
+    },
     create: {
       name: "Finca El Progreso",
       email: "productor@agrored.local",
@@ -48,31 +53,32 @@ async function main() {
       role: "PRODUCER",
       location: "Barrancabermeja, Santander",
       phone: "3000000000",
+      originNodeId: barrancaNode?.id || null,
     },
   });
 
   // 3. Crear comprador de demostración.
-  const buyerPasswordHash = await bcrypt.hash(
-    "Comprador2026!",
-    10
-  );
+  const buyerPasswordHash = await bcrypt.hash("Comprador2026!", 10);
 
   const buyer = await prisma.user.upsert({
     where: {
       email: "comprador@agrored.local",
     },
-    update: {},
+    update: {
+      originNodeId: bucaramangaNode?.id || null,
+    },
     create: {
       name: "Comprador Demo",
       email: "comprador@agrored.local",
       passwordHash: buyerPasswordHash,
       role: "BUYER",
-      location: "Barrancabermeja, Santander",
+      location: "Bucaramanga, Santander",
       phone: "3010000000",
+      originNodeId: bucaramangaNode?.id || null,
     },
   });
 
-  // 4. Productos iniciales.
+  // 4. Productos iniciales con sus nodos logísticos del Magdalena Medio.
   const products = [
     {
       name: "Arroz blanco",
@@ -81,6 +87,8 @@ async function main() {
       quantity: 500,
       unit: "kg",
       category: "Granos y cereales",
+      location: "Cantagallo, Bolívar",
+      originNodeId: cantagalloNode?.id || barrancaNode?.id || null,
     },
     {
       name: "Plátano hartón",
@@ -89,6 +97,8 @@ async function main() {
       quantity: 300,
       unit: "kg",
       category: "Frutas",
+      location: "Puerto Wilches, Santander",
+      originNodeId: wilchesNode?.id || barrancaNode?.id || null,
     },
     {
       name: "Yuca fresca",
@@ -97,6 +107,8 @@ async function main() {
       quantity: 250,
       unit: "kg",
       category: "Tubérculos y raíces",
+      location: "Barrancabermeja, Santander",
+      originNodeId: barrancaNode?.id || null,
     },
   ];
 
@@ -126,7 +138,16 @@ async function main() {
           unit: item.unit,
           producerId: producer.id,
           categoryId: category.id,
-          location: producer.location,
+          location: item.location || producer.location,
+          originNodeId: item.originNodeId,
+        },
+      });
+    } else if (!existing.originNodeId && item.originNodeId) {
+      await prisma.product.update({
+        where: { id: existing.id },
+        data: {
+          originNodeId: item.originNodeId,
+          location: existing.location || item.location,
         },
       });
     }
@@ -134,6 +155,7 @@ async function main() {
 
   // 5. Resumen de la carga.
   console.log("Categorías registradas:", categories.length);
+  console.log("Nodos logísticos del Magdalena Medio:", nodesByName.size);
   console.log("Productor de demostración:", producer.email);
   console.log("Comprador de demostración:", buyer.email);
   console.log("Productos de demostración procesados:", products.length);

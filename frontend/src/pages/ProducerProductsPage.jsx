@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
-import CategoryArt from "../components/CategoryArt";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { Alert, EmptyState, ErrorState, ListSkeleton } from "../components/Feedback";
 import Icon from "../components/Icon";
+import ProductVisual from "../components/ProductVisual";
 import { useToast } from "../context/useToast";
 import usePageTitle from "../hooks/usePageTitle";
 import { catalogApi } from "../services/agroApi";
+import { NODE_TYPE_LABELS } from "../utils/constants";
 import { formatCOP, formatQty } from "../utils/format";
 
 export default function ProducerProductsPage() {
@@ -21,8 +22,10 @@ export default function ProducerProductsPage() {
 
   const pendingForTarget = target
     ? requests.filter(
-        (r) => r.status === "PENDING" && r.product.id === target.id
-      ).length
+      (r) =>
+        ["PENDING", "COUNTER_OFFERED"].includes(r.status) &&
+        r.product.id === target.id
+    ).length
     : 0;
 
   async function confirmDeactivate() {
@@ -72,7 +75,11 @@ export default function ProducerProductsPage() {
             {products.map((product) => (
               <li className="producer-item" key={product.id}>
                 <div className="producer-item-art" aria-hidden="true">
-                  <CategoryArt name={product.category?.name} />
+                  <ProductVisual
+                    imageUrl={product.imageUrl}
+                    categoryName={product.category?.name}
+                    alt={product.name}
+                  />
                 </div>
 
                 <div className="producer-item-info">
@@ -85,6 +92,17 @@ export default function ProducerProductsPage() {
                     {Number(product.quantity) <= 0
                       ? "Agotado"
                       : `${formatQty(product.quantity)} ${product.unit} disponibles`}
+                    {product.originNode && (
+                      <>
+                        {" · "}
+                        <span>
+                          Nodo: {product.originNode.name} (
+                          {NODE_TYPE_LABELS[product.originNode.type] ||
+                            product.originNode.type}
+                          )
+                        </span>
+                      </>
+                    )}
                   </p>
                 </div>
 
@@ -110,8 +128,8 @@ export default function ProducerProductsPage() {
           </ul>
 
           <p className="footnote">
-            Aquí aparecen tus productos activos. Los productos desactivados no
-            se listan porque el servicio solo devuelve los activos.
+            Aquí aparecen tus productos activos. Puedes asociarles foto real del
+            lote y puerto/centro de acopio en Editar.
           </p>
         </>
       )}
@@ -135,7 +153,7 @@ export default function ProducerProductsPage() {
             {pendingForTarget > 0 && (
               <Alert tone="warning">
                 Tiene {pendingForTarget}{" "}
-                {pendingForTarget === 1 ? "solicitud pendiente" : "solicitudes pendientes"}.
+                {pendingForTarget === 1 ? "solicitud activa" : "solicitudes activas"}.
                 Un producto desactivado no permite aceptarlas.
               </Alert>
             )}

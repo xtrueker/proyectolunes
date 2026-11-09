@@ -1,30 +1,35 @@
 import Icon from "./Icon";
 import { STATUS_META } from "../utils/constants";
 
-const FLOW = ["PENDING", "ACCEPTED", "COMPLETED"];
-const LABELS = {
-  PENDING: "Solicitud enviada",
-  ACCEPTED: "Aceptada por el productor",
-  COMPLETED: "Entrega completada",
-};
-
 export default function RequestStepper({ status }) {
   const meta = STATUS_META[status];
 
   if (status === "REJECTED" || status === "CANCELLED") {
     return (
-      <p className={`stepper-end stepper-end-${meta.tone}`}>
-        <Icon name={meta.icon} size={18} />
-        {meta.hint}
+      <p className={`stepper-end stepper-end-${meta?.tone || "cancelled"}`}>
+        <Icon name={meta?.icon || "info"} size={18} />
+        {meta?.hint || status}
       </p>
     );
   }
 
-  const current = FLOW.indexOf(status);
+  const flow =
+    status === "COUNTER_OFFERED"
+      ? ["PENDING", "COUNTER_OFFERED", "ACCEPTED", "COMPLETED"]
+      : ["PENDING", "ACCEPTED", "COMPLETED"];
+
+  const labels = {
+    PENDING: "Solicitud enviada",
+    COUNTER_OFFERED: "Contraoferta activa",
+    ACCEPTED: "Acuerdo confirmado",
+    COMPLETED: "Entrega completada",
+  };
+
+  const current = flow.indexOf(status);
 
   return (
     <ol className="stepper" aria-label="Progreso de la solicitud">
-      {FLOW.map((step, index) => {
+      {flow.map((step, index) => {
         const done = index < current || status === "COMPLETED";
         const state = done ? "is-done" : index === current ? "is-current" : "";
 
@@ -37,7 +42,7 @@ export default function RequestStepper({ status }) {
             <span className="stepper-dot">
               {done && <Icon name="check" size={12} />}
             </span>
-            <span>{LABELS[step]}</span>
+            <span>{labels[step]}</span>
           </li>
         );
       })}

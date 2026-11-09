@@ -1,7 +1,7 @@
-// Funciones por recurso. Solo existen aquí los endpoints reales del backend.
+// Funciones por recurso. Conserva intactas las firmas Fase 1 y añade los módulos Fase 2 e Innovación.
 import { apiRequest } from "./api";
 
-function toQuery(params) {
+function toQuery(params = {}) {
   const query = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
@@ -26,9 +26,23 @@ export const authApi = {
 
 export const catalogApi = {
   categories: () => apiRequest("/categories"),
-  products: ({ search, categoryId, location, minPrice, maxPrice } = {}) =>
+  products: ({
+    search,
+    categoryId,
+    location,
+    minPrice,
+    maxPrice,
+    originNodeId,
+  } = {}) =>
     apiRequest(
-      `/products${toQuery({ search, categoryId, location, minPrice, maxPrice })}`
+      `/products${toQuery({
+        search,
+        categoryId,
+        location,
+        minPrice,
+        maxPrice,
+        originNodeId,
+      })}`
     ),
   product: (id) => apiRequest(`/products/${encodeURIComponent(id)}`),
   createProduct: (data) => apiRequest("/products", json("POST", data)),
@@ -38,6 +52,22 @@ export const catalogApi = {
     apiRequest(`/products/${encodeURIComponent(id)}/deactivate`, {
       method: "PATCH",
     }),
+  parseDraft: (text) =>
+    apiRequest("/products/parse-draft", json("POST", { text })),
+};
+
+export const logisticsApi = {
+  nodes: (params = {}) => apiRequest(`/logistics/nodes${toQuery(params)}`),
+  segments: () => apiRequest("/logistics/segments"),
+  riverStatus: () => apiRequest("/logistics/river-status"),
+  quote: (data) => apiRequest("/logistics/quote", json("POST", data)),
+  fairPrice: (data) => apiRequest("/logistics/fair-price", json("POST", data)),
+};
+
+export const poolsApi = {
+  available: (params = {}) => apiRequest(`/pools/available${toQuery(params)}`),
+  list: (params = {}) => apiRequest(`/pools${toQuery(params)}`),
+  join: (data) => apiRequest("/pools/join", json("POST", data)),
 };
 
 export const requestsApi = {
@@ -48,4 +78,25 @@ export const requestsApi = {
       `/purchase-requests/${encodeURIComponent(id)}/status`,
       json("PATCH", { status })
     ),
+  counteroffer: (id, data) =>
+    apiRequest(
+      `/requests/${encodeURIComponent(id)}/counteroffer`,
+      json("PATCH", data)
+    ),
+  respondCounteroffer: (id, decision) =>
+    apiRequest(
+      `/requests/${encodeURIComponent(id)}/counteroffer/respond`,
+      json("PATCH", { decision })
+    ),
+  tracking: (id) =>
+    apiRequest(`/requests/${encodeURIComponent(id)}/tracking`),
+  addTracking: (id, data) =>
+    apiRequest(
+      `/requests/${encodeURIComponent(id)}/tracking`,
+      json("POST", data)
+    ),
+  fundEscrow: (id) =>
+    apiRequest(`/requests/${encodeURIComponent(id)}/escrow/fund`, {
+      method: "POST",
+    }),
 };

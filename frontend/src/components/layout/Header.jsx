@@ -91,6 +91,9 @@ export default function Header() {
             <NavLink to="/catalogo" className={navClass}>
               Catálogo
             </NavLink>
+            <NavLink to="/logistica" className={navClass}>
+              Logística y Pools
+            </NavLink>
             {user && (
               <NavLink to={dashboardPath} className={navClass}>
                 {dashboardLabel}

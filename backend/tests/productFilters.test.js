@@ -14,8 +14,8 @@ describe("Filtros del catálogo de productos", () => {
     const result = buildProductFilters({ search: "arroz" });
 
     assert.deepEqual(result.where.OR, [
-      { name: { contains: "arroz" } },
-      { description: { contains: "arroz" } },
+      { name: { contains: "arroz", mode: "insensitive" } },
+      { description: { contains: "arroz", mode: "insensitive" } },
     ]);
   });
 
@@ -28,6 +28,7 @@ describe("Filtros del catálogo de productos", () => {
     assert.equal(result.where.categoryId, "cat-1");
     assert.deepEqual(result.where.location, {
       contains: "Barrancabermeja",
+      mode: "insensitive",
     });
   });
 

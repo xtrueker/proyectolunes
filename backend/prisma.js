@@ -1,15 +1,23 @@
 import "dotenv/config";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client.ts";
 
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-  throw new Error("Falta la variable DATABASE_URL en el archivo .env");
+  throw new Error("Falta la variable DATABASE_URL en el archivo backend/.env");
 }
 
-const adapter = new PrismaLibSql({
-  url: databaseUrl,
+if (databaseUrl.includes("[YOUR-PASSWORD]")) {
+  throw new Error(
+    "Debes reemplazar [YOUR-PASSWORD] en backend/.env con la contraseña real de tu base de datos Supabase."
+  );
+}
+
+const adapter = new PrismaPg({
+  connectionString: databaseUrl,
+  ssl: { rejectUnauthorized: false },
+  max: 10,
 });
 
 export const prisma = new PrismaClient({ adapter });

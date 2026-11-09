@@ -1,4 +1,3 @@
-﻿
 import { Router } from "express";
 import { prisma } from "../prisma.js";
 import {
@@ -6,11 +5,48 @@ import {
   authorizeRoles,
 } from "../middleware/auth.js";
 import { buildProductFilters } from "../utils/productFilters.js";
+import { VALID_PERISHABILITY } from "../utils/routeOptimizer.js";
+import {
+  inferPerishability,
+  parseRuralDraft,
+} from "../utils/fairPriceEngine.js";
 
 const router = Router();
 
+// POST /api/products/parse-draft: asistente rural en lenguaje natural (texto o dictado por voz).
+router.post("/parse-draft", async (req, res) => {
+  try {
+    const { text } = req.body || {};
+    const [categories, nodes] = await Promise.all([
+      prisma.category.findMany({ orderBy: { name: "asc" } }),
+      prisma.logisticsNode.findMany({ orderBy: { name: "asc" } }),
+    ]);
+
+    const parsed = parseRuralDraft(text, { categories, nodes });
+
+    if (parsed.error) {
+      return res.status(400).json({
+        success: false,
+        message: parsed.error,
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: parsed.data,
+    });
+  } catch (error) {
+    console.error("Error al interpretar publicación rural:", error);
+    return res.status(500).json({
+      success: false,
+      message: "No se pudo interpretar el texto de publicación.",
+    });
+  }
+});
+
 const productInclude = {
   category: true,
+  originNode: true,
   producer: {
     select: {
       id: true,
@@ -94,6 +130,9 @@ router.post(
         unit,
         categoryId,
         location,
+        imageUrl,
+        originNodeId,
+        perishability,
       } = req.body;
 
       if (
@@ -140,6 +179,40 @@ router.post(
         });
       }
 
+      let resolvedOriginNode = null;
+      if (originNodeId) {
+        resolvedOriginNode = await prisma.logisticsNode.findUnique({
+          where: { id: String(originNodeId) },
+        });
+        if (!resolvedOriginNode) {
+          return res.status(404).json({
+            success: false,
+            message: "El nodo logístico de origen no existe.",
+          });
+        }
+      }
+
+      const trimmedImageUrl =
+        typeof imageUrl === "string" && imageUrl.trim()
+          ? imageUrl.trim()
+          : null;
+
+      const trimmedLocation =
+        typeof location === "string" && location.trim()
+          ? location.trim()
+          : resolvedOriginNode
+            ? `${resolvedOriginNode.name}, ${resolvedOriginNode.department}`
+            : req.user.location || null;
+
+      const resolvedPerishability =
+        perishability &&
+        VALID_PERISHABILITY.includes(String(perishability).toUpperCase())
+          ? String(perishability).toUpperCase()
+          : inferPerishability({
+              productName: name,
+              categoryName: category.name,
+            });
+
       const product = await prisma.product.create({
         data: {
           name: name.trim(),
@@ -147,10 +220,10 @@ router.post(
           price: numericPrice,
           quantity: numericQuantity,
           unit: unit.trim(),
-          location:
-            typeof location === "string" && location.trim()
-              ? location.trim()
-              : req.user.location || null,
+          location: trimmedLocation,
+          imageUrl: trimmedImageUrl,
+          perishability: resolvedPerishability,
+          originNodeId: resolvedOriginNode ? resolvedOriginNode.id : null,
           categoryId: String(categoryId),
           producerId: req.user.id,
         },
@@ -206,6 +279,9 @@ router.put(
         unit,
         categoryId,
         location,
+        imageUrl,
+        originNodeId,
+        perishability,
       } = req.body;
 
       const data = {};
@@ -285,14 +361,57 @@ router.put(
       }
 
       if (location !== undefined) {
-        if (typeof location !== "string") {
+        if (location !== null && typeof location !== "string") {
           return res.status(400).json({
             success: false,
             message: "La ubicación no es válida.",
           });
         }
 
-        data.location = location.trim() || null;
+        data.location = location ? location.trim() || null : null;
+      }
+
+      if (imageUrl !== undefined) {
+        if (imageUrl !== null && typeof imageUrl !== "string") {
+          return res.status(400).json({
+            success: false,
+            message: "La URL de imagen no es válida.",
+          });
+        }
+
+        data.imageUrl = imageUrl ? imageUrl.trim() || null : null;
+      }
+
+      if (originNodeId !== undefined) {
+        if (!originNodeId) {
+          data.originNodeId = null;
+        } else {
+          const node = await prisma.logisticsNode.findUnique({
+            where: { id: String(originNodeId) },
+          });
+          if (!node) {
+            return res.status(404).json({
+              success: false,
+              message: "El nodo logístico de origen no existe.",
+            });
+          }
+          data.originNodeId = node.id;
+        }
+      }
+
+      if (perishability !== undefined) {
+        if (!perishability) {
+          data.perishability = null;
+        } else {
+          const norm = String(perishability).toUpperCase();
+          if (!VALID_PERISHABILITY.includes(norm)) {
+            return res.status(400).json({
+              success: false,
+              message: "Nivel de perecibilidad no válido (LOW, MEDIUM o HIGH).",
+            });
+          }
+          data.perishability = norm;
+        }
       }
 
       if (Object.keys(data).length === 0) {

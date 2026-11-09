@@ -118,6 +118,18 @@ export default function AuthPage({ mode }) {
     }
   }
 
+  async function quickDemoLogin(email, password) {
+    setSubmitting(true);
+    setFormError("");
+    try {
+      const logged = await login(email, password);
+      toast.success(`Sesión de demostración iniciada como ${logged.name}.`);
+    } catch (error) {
+      setFormError(error.message);
+      setSubmitting(false);
+    }
+  }
+
   return (
     <div className="auth-shell">
       <aside className="auth-aside on-dark">
@@ -145,6 +157,39 @@ export default function AuthPage({ mode }) {
             ? "Elige cómo vas a usar Agro-Red Magdalena."
             : "Usa el correo y la contraseña de tu cuenta."}
         </p>
+
+        {!isRegister && (
+          <div className="demo-access-box" aria-label="Cuentas de demostración">
+            <span className="demo-access-title">
+              <Icon name="spark" size={16} />
+              Acceso rápido de demostración (1 clic):
+            </span>
+            <div className="demo-access-buttons">
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                disabled={submitting}
+                onClick={() =>
+                  quickDemoLogin("productor@agrored.local", "AgroRed2026!")
+                }
+              >
+                <Icon name="store" size={15} />
+                Entrar como Productor
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                disabled={submitting}
+                onClick={() =>
+                  quickDemoLogin("comprador@agrored.local", "Comprador2026!")
+                }
+              >
+                <Icon name="user" size={15} />
+                Entrar como Comprador
+              </button>
+            </div>
+          </div>
+        )}
 
         <form className="stack" onSubmit={handleSubmit} noValidate>
           {isRegister && (

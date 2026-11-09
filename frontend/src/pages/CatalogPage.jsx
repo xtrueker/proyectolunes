@@ -5,7 +5,7 @@ import Icon from "../components/Icon";
 import ProductCard from "../components/ProductCard";
 import useApi from "../hooks/useApi";
 import usePageTitle from "../hooks/usePageTitle";
-import { catalogApi } from "../services/agroApi";
+import { catalogApi, logisticsApi } from "../services/agroApi";
 
 const SORTS = {
   recientes: "Más recientes",
@@ -20,21 +20,39 @@ export default function CatalogPage() {
   const [params, setParams] = useSearchParams();
   const q = params.get("q") || "";
   const categoryId = params.get("categoryId") || "";
+  const originNodeId = params.get("originNodeId") || "";
+  const minPrice = params.get("minPrice") || "";
+  const maxPrice = params.get("maxPrice") || "";
   const sort = SORTS[params.get("orden")] ? params.get("orden") : "recientes";
 
   const [text, setText] = useState(q);
+  const [minDraft, setMinDraft] = useState(minPrice);
+  const [maxDraft, setMaxDraft] = useState(maxPrice);
   const timer = useRef(null);
+  const priceTimer = useRef(null);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
-
-  const categories = useApi(() => catalogApi.categories(), []);
-  const products = useApi(
-    () => catalogApi.products({ search: q, categoryId }),
-    [q, categoryId]
+  useEffect(
+    () => () => {
+      clearTimeout(timer.current);
+      clearTimeout(priceTimer.current);
+    },
+    []
   );
 
-  // Se parte de la URL actual (no de un render anterior) para que el retardo
-  // de la búsqueda nunca pise un filtro elegido mientras tanto.
+  const categories = useApi(() => catalogApi.categories(), []);
+  const nodes = useApi(() => logisticsApi.nodes(), []);
+  const products = useApi(
+    () =>
+      catalogApi.products({
+        search: q,
+        categoryId,
+        originNodeId,
+        minPrice,
+        maxPrice,
+      }),
+    [q, categoryId, originNodeId, minPrice, maxPrice]
+  );
+
   function setParam(key, value) {
     const next = new URLSearchParams(window.location.search);
     if (value) next.set(key, value);
@@ -49,13 +67,25 @@ export default function CatalogPage() {
     timer.current = setTimeout(() => setParam("q", value.trim()), 350);
   }
 
+  function handlePriceChange(bound, value) {
+    if (bound === "minPrice") setMinDraft(value);
+    else setMaxDraft(value);
+
+    clearTimeout(priceTimer.current);
+    priceTimer.current = setTimeout(() => {
+      setParam(bound, value.trim());
+    }, 400);
+  }
+
   function clearFilters() {
     clearTimeout(timer.current);
+    clearTimeout(priceTimer.current);
     setText("");
+    setMinDraft("");
+    setMaxDraft("");
     setParams({}, { replace: true });
   }
 
-  // El orden se aplica en el navegador: la API no ofrece parámetro de orden.
   const sorted = useMemo(() => {
     const list = [...(products.data || [])];
 
@@ -66,16 +96,19 @@ export default function CatalogPage() {
     return list;
   }, [products.data, sort]);
 
-  const hasFilters = Boolean(q || categoryId);
+  const hasFilters = Boolean(
+    q || categoryId || originNodeId || minPrice || maxPrice
+  );
   const activeCategory = (categories.data || []).find((c) => c.id === categoryId);
+  const activeNode = (nodes.data || []).find((n) => n.id === originNodeId);
 
   return (
     <div className="container page">
       <header className="page-head">
-        <h1>Catálogo de productos</h1>
+        <h1>Catálogo comercial directo</h1>
         <p>
-          Productos agrícolas y pecuarios publicados directamente por los
-          productores.
+          Lotes agrícolas, pecuarios y pesqueros publicados directamente desde
+          puertos fluviales y centros de acopio del Magdalena Medio.
         </p>
       </header>
 
@@ -83,16 +116,60 @@ export default function CatalogPage() {
         <div className="search-box">
           <Icon name="search" size={20} />
           <label htmlFor="busqueda" className="sr-only">
-            Buscar productos por nombre
+            Buscar productos por nombre o descripción
           </label>
           <input
             id="busqueda"
             type="search"
             className="control"
-            placeholder="Buscar por nombre, por ejemplo: plátano"
+            placeholder="Buscar por cultivo, variedad o descripción…"
             value={text}
             onChange={handleSearchChange}
           />
+        </div>
+
+        <div className="sort-box">
+          <label htmlFor="nodo">Puerto / Nodo origen</label>
+          <select
+            id="nodo"
+            className="control"
+            value={originNodeId}
+            onChange={(event) => setParam("originNodeId", event.target.value)}
+          >
+            <option value="">Todos los nodos</option>
+            {(nodes.data || []).map((node) => (
+              <option key={node.id} value={node.id}>
+                {node.name} ({node.department})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="price-filter-group">
+          <div>
+            <label htmlFor="minPrice">Precio mín. (COP)</label>
+            <input
+              id="minPrice"
+              type="number"
+              min="0"
+              className="control"
+              placeholder="Ej. 1500"
+              value={minDraft}
+              onChange={(e) => handlePriceChange("minPrice", e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="maxPrice">Precio máx. (COP)</label>
+            <input
+              id="maxPrice"
+              type="number"
+              min="0"
+              className="control"
+              placeholder="Ej. 10000"
+              value={maxDraft}
+              onChange={(e) => handlePriceChange("maxPrice", e.target.value)}
+            />
+          </div>
         </div>
 
         <div className="sort-box">
@@ -134,6 +211,15 @@ export default function CatalogPage() {
             {category.name}
           </button>
         ))}
+        {hasFilters && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={clearFilters}
+          >
+            Limpiar filtros
+          </button>
+        )}
       </div>
 
       <p className="result-count" aria-live="polite">
@@ -141,7 +227,9 @@ export default function CatalogPage() {
           ? "Buscando productos…"
           : `${sorted.length} ${sorted.length === 1 ? "producto" : "productos"}${
               activeCategory ? ` en ${activeCategory.name}` : ""
-            }${q ? ` para “${q}”` : ""}`}
+            }${activeNode ? ` desde ${activeNode.name}` : ""}${
+              q ? ` para “${q}”` : ""
+            }`}
       </p>
 
       {products.loading && !products.data ? (
@@ -161,7 +249,7 @@ export default function CatalogPage() {
           }
         >
           {hasFilters
-            ? "Prueba con otro nombre o elige otra categoría."
+            ? "Prueba con otro nombre, rango de precio, categoría o nodo logístico."
             : "Cuando los productores publiquen sus productos aparecerán aquí."}
         </EmptyState>
       ) : (

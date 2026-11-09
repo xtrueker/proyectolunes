@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
@@ -18,15 +18,18 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  originNodeId String?
+  originNode   LogisticsNode? @relation("UserOriginNode", fields: [originNodeId], references: [id])
+
   products         Product[]
   purchaseRequests PurchaseRequest[]
 }
 
 model Category {
-  id        String    @id @default(cuid())
-  name      String    @unique
+  id        String   @id @default(cuid())
+  name      String   @unique
   products  Product[]
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Product {
@@ -36,9 +39,11 @@ model Product {
   price       Float
   quantity    Float
   unit        String
-  active      Boolean  @default(true)
-  location    String?
-  createdAt   DateTime @default(now())
+  active        Boolean  @default(true)
+  location      String?
+  imageUrl      String?
+  perishability String?
+  createdAt     DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   producerId String
@@ -46,6 +51,9 @@ model Product {
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
+
+  originNodeId String?
+  originNode   LogisticsNode? @relation("ProductOriginNode", fields: [originNodeId], references: [id])
 
   purchaseRequests PurchaseRequest[]
 }
@@ -59,12 +67,98 @@ model PurchaseRequest {
   destination        String?
   transportType      String?
   notes              String?
+  imageUrl           String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  counterPrice         Float?
+  counterDate          DateTime?
+  negotiationNotes     String?
+  freightCostEstimated Float?
+  allocatedFreightCost Float?
+
+  escrowStatus         String?
+  escrowTotalAmount    Float?
+  escrowReleasedAmount Float?    @default(0)
+  escrowUpdatedAt      DateTime?
 
   buyerId String
   buyer   User   @relation(fields: [buyerId], references: [id])
 
   productId String
   product   Product @relation(fields: [productId], references: [id])
+
+  originNodeId String?
+  originNode   LogisticsNode? @relation("RequestOriginNode", fields: [originNodeId], references: [id])
+
+  destNodeId String?
+  destNode   LogisticsNode? @relation("RequestDestNode", fields: [destNodeId], references: [id])
+
+  poolId String?
+  pool   ShipmentPool? @relation(fields: [poolId], references: [id])
+
+  trackingEvents TrackingEvent[]
+}
+
+model LogisticsNode {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  type       String
+  department String
+  latitude   Float?
+  longitude  Float?
+  createdAt  DateTime @default(now())
+
+  outgoingSegments RouteSegment[]    @relation("SegmentOrigin")
+  incomingSegments RouteSegment[]    @relation("SegmentDestination")
+  users            User[]            @relation("UserOriginNode")
+  products         Product[]         @relation("ProductOriginNode")
+  originRequests   PurchaseRequest[] @relation("RequestOriginNode")
+  destRequests     PurchaseRequest[] @relation("RequestDestNode")
+  originPools      ShipmentPool[]    @relation("PoolOriginNode")
+  destPools        ShipmentPool[]    @relation("PoolDestNode")
+}
+
+model RouteSegment {
+  id             String   @id @default(cuid())
+  originId       String
+  origin         LogisticsNode @relation("SegmentOrigin", fields: [originId], references: [id])
+  destinationId  String
+  destination    LogisticsNode @relation("SegmentDestination", fields: [destinationId], references: [id])
+  mode           String
+  distanceKm     Float
+  costPerTon     Float
+  estimatedHours Float
+  transferFee    Float    @default(0)
+  createdAt      DateTime @default(now())
+
+  @@unique([originId, destinationId, mode])
+}
+
+model ShipmentPool {
+  id               String   @id @default(cuid())
+  originNodeId     String
+  originNode       LogisticsNode @relation("PoolOriginNode", fields: [originNodeId], references: [id])
+  destNodeId       String
+  destNode         LogisticsNode @relation("PoolDestNode", fields: [destNodeId], references: [id])
+  mode             String
+  departureDate    DateTime
+  maxCapacityKg    Float
+  currentWeightKg  Float    @default(0)
+  totalFreightCost Float
+  status           String   @default("OPEN")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  requests PurchaseRequest[]
+}
+
+model TrackingEvent {
+  id                String          @id @default(cuid())
+  purchaseRequestId String
+  purchaseRequest   PurchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+  stage             String
+  notes             String?
+  evidenceImageUrl  String?
+  createdAt         DateTime        @default(now())
 }

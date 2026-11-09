@@ -5,18 +5,20 @@ export function buildProductFilters({
   location,
   minPrice,
   maxPrice,
+  originNodeId,
 }) {
   const where = { active: true };
 
   if (search) {
     where.OR = [
-      { name: { contains: String(search) } },
-      { description: { contains: String(search) } },
+      { name: { contains: String(search), mode: "insensitive" } },
+      { description: { contains: String(search), mode: "insensitive" } },
     ];
   }
 
   if (categoryId) where.categoryId = String(categoryId);
-  if (location) where.location = { contains: String(location) };
+  if (originNodeId) where.originNodeId = String(originNodeId);
+  if (location) where.location = { contains: String(location), mode: "insensitive" };
 
   if (minPrice !== undefined || maxPrice !== undefined) {
     where.price = {};

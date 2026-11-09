@@ -25,7 +25,7 @@ export default function ProducerLayout() {
   const requests = useMemo(() => requestsQuery.data || [], [requestsQuery.data]);
 
   const count = (status) => requests.filter((r) => r.status === status).length;
-  const pending = count("PENDING");
+  const pending = count("PENDING") + count("COUNTER_OFFERED");
 
   const stats = [
     { label: "Productos activos", value: products.length, loading: productsQuery.loading },

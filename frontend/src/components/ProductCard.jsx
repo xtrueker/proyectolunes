@@ -1,18 +1,29 @@
 import { Link } from "react-router-dom";
-import CategoryArt from "./CategoryArt";
 import Icon from "./Icon";
+import ProductVisual from "./ProductVisual";
+import { NODE_TYPE_LABELS } from "../utils/constants";
 import { formatCOP, formatQty } from "../utils/format";
 
 export default function ProductCard({ product }) {
   const soldOut = Number(product.quantity) <= 0;
   const detailPath = `/productos/${product.id}`;
-  const place = product.location || product.producer?.location;
+  const place =
+    product.originNode?.name
+      ? `${product.originNode.name} (${NODE_TYPE_LABELS[product.originNode.type] || product.originNode.department})`
+      : product.location || product.producer?.location;
 
   return (
     <article className="product-card">
       <Link to={detailPath} className="product-card-art" tabIndex={-1} aria-hidden="true">
-        <CategoryArt name={product.category?.name} />
+        <ProductVisual
+          imageUrl={product.imageUrl}
+          categoryName={product.category?.name}
+          alt={product.name}
+        />
         {soldOut && <span className="sold-out">Agotado</span>}
+        {product.imageUrl && !soldOut && (
+          <span className="photo-pill">Foto real</span>
+        )}
       </Link>
 
       <div className="product-card-body">
@@ -29,7 +40,7 @@ export default function ProductCard({ product }) {
 
         <ul className="meta-list">
           <li>
-            <Icon name="pin" size={16} />
+            <Icon name={product.originNode ? "anchor" : "pin"} size={16} />
             {place || "Ubicación no indicada"}
           </li>
           <li>
@@ -46,7 +57,7 @@ export default function ProductCard({ product }) {
           className={`btn btn-block ${soldOut ? "btn-secondary" : "btn-primary"}`}
           to={detailPath}
         >
-          {soldOut ? "Ver producto" : "Ver y solicitar"}
+          {soldOut ? "Ver producto" : "Cotizar y solicitar"}
         </Link>
       </div>
     </article>

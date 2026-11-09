@@ -21,6 +21,7 @@ export default function Footer() {
           <h2>Explorar</h2>
           <Link to="/">Inicio</Link>
           <Link to="/catalogo">Catálogo de productos</Link>
+          <Link to="/logistica">Red logística y pools</Link>
         </nav>
 
         <nav className="footer-col" aria-label="Tu cuenta">

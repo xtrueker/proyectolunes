@@ -216,6 +216,7 @@ textarea.control { min-height: 96px; resize: vertical; }
   font-size: 0.82rem; font-weight: 700; white-space: nowrap;
 }
 .badge-pending { background: #f8e7bd; color: #6d4b05; }
+.badge-counter { background: #f3dfc8; color: var(--cacao); }
 .badge-accepted { background: #d7e9ef; color: #1d5a73; }
 .badge-completed { background: #d8ebd0; color: #235a2c; }
 .badge-rejected { background: #f6dbd6; color: #8c2a20; }
@@ -289,6 +290,7 @@ textarea.control { min-height: 96px; resize: vertical; }
 
 /* Tono por estado (variable --tone) */
 .tone-pending { --tone: #d29a24; }
+.tone-counter { --tone: var(--cacao); }
 .tone-accepted { --tone: #2f7a99; }
 .tone-completed { --tone: #3f8a4a; }
 .tone-rejected { --tone: #b5422f; }

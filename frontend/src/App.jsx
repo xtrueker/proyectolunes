@@ -4,6 +4,7 @@ import RequireAuth from "./components/layout/RequireAuth";
 import HomePage from "./pages/HomePage";
 import CatalogPage from "./pages/CatalogPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import LogisticsPage from "./pages/LogisticsPage";
 import AuthPage from "./pages/AuthPage";
 import BuyerRequestsPage from "./pages/BuyerRequestsPage";
 import ProducerLayout from "./pages/ProducerLayout";
@@ -23,6 +24,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="catalogo" element={<CatalogPage />} />
+        <Route path="logistica" element={<LogisticsPage />} />
         <Route path="productos/:id" element={<ProductDetailPage />} />
         <Route path="ingresar" element={<AuthPage key="login" mode="login" />} />
         <Route path="registro" element={<AuthPage key="register" mode="register" />} />

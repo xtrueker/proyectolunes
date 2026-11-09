@@ -1,13 +1,78 @@
 import { Link, useLocation, useParams } from "react-router-dom";
-import CategoryArt from "../components/CategoryArt";
 import { Alert, ErrorState, PageLoader } from "../components/Feedback";
 import Icon from "../components/Icon";
+import ProductVisual from "../components/ProductVisual";
 import PurchaseForm from "../components/PurchaseForm";
 import { useAuth } from "../context/useAuth";
 import useApi from "../hooks/useApi";
 import usePageTitle from "../hooks/usePageTitle";
-import { catalogApi } from "../services/agroApi";
+import { catalogApi, logisticsApi } from "../services/agroApi";
+import { NODE_TYPE_LABELS } from "../utils/constants";
 import { formatCOP, formatDate, formatQty } from "../utils/format";
+
+function FairTradeInsights({ product }) {
+  const { data: fair } = useApi(
+    () =>
+      logisticsApi.fairPrice({
+        productName: product.name,
+        categoryName: product.category?.name,
+        unit: product.unit,
+        producerPrice: product.price,
+        quantity: Math.min(200, Math.max(50, product.quantity)),
+        originNodeId: product.originNodeId || undefined,
+      }),
+    [product.id, product.price]
+  );
+
+  if (!fair) return null;
+
+  return (
+    <section className="fair-detail-banner" aria-label="Transparencia de precio directo">
+      <div className="fair-detail-head">
+        <Icon name="spark" size={18} />
+        <strong>Transparencia de Comercio Directo (Ref. SIPSA-DANE)</strong>
+      </div>
+
+      <div className="fair-detail-grid">
+        <div>
+          <span>Intermediario típico en puerto</span>
+          <strong>
+            {formatCOP(fair.intermediaryTypicalPerUnit)} / {product.unit}
+          </strong>
+        </div>
+        <div>
+          <span>Precio directo aquí</span>
+          <strong className="is-highlight-price">
+            {formatCOP(product.price)} / {product.unit}
+          </strong>
+        </div>
+        <div>
+          <span>Central mayorista (ref.)</span>
+          <strong>
+            {formatCOP(fair.wholesaleRefPerUnit)} / {product.unit}
+          </strong>
+        </div>
+      </div>
+
+      <p className="fair-detail-foot">
+        {fair.producerGainVsIntermediaryPct > 0 && (
+          <span>
+            El productor recibe{" "}
+            <strong>+{fair.producerGainVsIntermediaryPct}%</strong> frente a la
+            intermediación tradicional.{" "}
+          </span>
+        )}
+        {fair.buyerSavingsVsWholesalePct > 0 && (
+          <span>
+            El comprador ahorra aprox.{" "}
+            <strong>{fair.buyerSavingsVsWholesalePct}%</strong> puesto en destino
+            frente a central mayorista.
+          </span>
+        )}
+      </p>
+    </section>
+  );
+}
 
 function PurchasePanel({ product }) {
   const { user, loading } = useAuth();
@@ -18,10 +83,10 @@ function PurchasePanel({ product }) {
   if (!user) {
     return (
       <div className="purchase-form">
-        <h2>Solicitar este producto</h2>
+        <h2>Cotizar y solicitar</h2>
         <p className="form-lead">
-          Necesitas una cuenta de comprador para enviar una solicitud al
-          productor.
+          Inicia sesión como comprador para cotizar rutas multimodales, unirte a
+          un pool de carga consolidada y enviar tu solicitud.
         </p>
         <div className="stack-sm">
           <Link
@@ -33,6 +98,10 @@ function PurchasePanel({ product }) {
           </Link>
           <Link to="/registro" className="btn btn-secondary btn-block">
             Crear cuenta de comprador
+          </Link>
+          <Link to="/logistica" className="btn btn-ghost btn-block">
+            <Icon name="route" size={18} />
+            Probar simulador de rutas
           </Link>
         </div>
       </div>
@@ -54,7 +123,7 @@ function PurchasePanel({ product }) {
             className="btn btn-primary btn-block"
           >
             <Icon name="edit" size={18} />
-            Editar este producto
+            Editar producto / foto / nodo
           </Link>
         )}
       </div>
@@ -102,11 +171,16 @@ export default function ProductDetailPage() {
       <div className="detail-layout">
         <article className="detail-main">
           <div className="detail-art">
-            <CategoryArt name={product.category?.name} />
+            <ProductVisual
+              imageUrl={product.imageUrl}
+              categoryName={product.category?.name}
+              alt={product.name}
+            />
           </div>
           <p className="art-note">
-            Ilustración de la categoría. La plataforma aún no guarda fotos de
-            los productos.
+            {product.imageUrl
+              ? "Fotografía real del lote publicada por el productor."
+              : "Ilustración de referencia por categoría (el productor aún no adjuntó foto del lote)."}
           </p>
 
           <p className="product-card-cat">{product.category?.name}</p>
@@ -134,10 +208,14 @@ export default function ProductDetailPage() {
             </div>
             <div>
               <dt>
-                <Icon name="pin" size={18} />
-                Ubicación
+                <Icon name="anchor" size={18} />
+                Nodo logístico origen
               </dt>
-              <dd>{place || "No indicada"}</dd>
+              <dd>
+                {product.originNode
+                  ? `${product.originNode.name} (${NODE_TYPE_LABELS[product.originNode.type] || product.originNode.type})`
+                  : place || "No indicado"}
+              </dd>
             </div>
             <div>
               <dt>
@@ -154,9 +232,11 @@ export default function ProductDetailPage() {
               <dd>{formatDate(product.createdAt)}</dd>
             </div>
           </dl>
+
+          <FairTradeInsights product={product} />
         </article>
 
-        <aside className="detail-side" aria-label="Solicitud de compra">
+        <aside className="detail-side" aria-label="Solicitud de compra y logística">
           <PurchasePanel product={product} />
         </aside>
       </div>

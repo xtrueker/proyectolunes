@@ -1,0 +1,19 @@
+{
+  "name": "Agro-Red Magdalena — Logística y Comercio Rural",
+  "short_name": "Agro-Red",
+  "description": "Marketplace B2B directo y red logística multimodal fluvial-terrestre del Magdalena Medio.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f3e6",
+  "theme_color": "#143528",
+  "lang": "es-CO",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
+

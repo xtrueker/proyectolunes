@@ -272,3 +272,1320 @@
   .toast-region { right: 0.75rem; bottom: 0.75rem; }
   .dialog-actions .btn { flex: 1 1 100%; }
 }
+
+
+/* ---------- Fase 2: Fotos reales, Cotizador Multimodal, Pools y Trazabilidad ---------- */
+.product-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-pill {
+  position: absolute;
+  bottom: 0.65rem;
+  right: 0.65rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(12, 34, 25, 0.82);
+  color: var(--cream);
+  font-size: 0.76rem;
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+}
+
+.photo-upload-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  background: var(--cream);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-md);
+}
+
+.photo-upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.file-btn {
+  cursor: pointer;
+}
+
+.node-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--r-sm);
+  background: var(--sage-light);
+  color: var(--pine);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+/* Cotizador en tarjeta lateral de compra */
+.quoter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem;
+  background: var(--cream);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+}
+
+.quoter-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--pine);
+  font-size: 0.95rem;
+}
+
+.route-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.route-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  background: var(--paper);
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-md);
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.route-option:hover:not(:disabled) {
+  border-color: var(--pine);
+}
+
+.route-option.is-selected {
+  border-color: var(--pine);
+  background: var(--sage-light);
+  box-shadow: inset 0 0 0 1px var(--pine);
+}
+
+.route-option-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.route-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  color: var(--pine);
+  font-size: 0.92rem;
+}
+
+.route-badges {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.mini-pill {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.pill-best {
+  background: var(--marigold);
+  color: var(--pine-deep);
+}
+
+.pill-fast {
+  background: var(--info-soft);
+  color: #1d5a73;
+}
+
+.route-option-metrics {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.route-option-metrics strong {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--pine);
+}
+
+.route-option-metrics span {
+  font-size: 0.83rem;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.route-steps-text {
+  color: var(--ink-3);
+  font-size: 0.8rem;
+}
+
+/* Banner de Pool Colaborativo */
+.pool-banner {
+  padding: 0.8rem 0.9rem;
+  border-radius: var(--r-md);
+  background: var(--paper);
+  border: 1.5px dashed var(--moss);
+}
+
+.pool-banner.has-pool {
+  background: #e5efe0;
+  border-style: solid;
+}
+
+.pool-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+}
+
+.pool-check input {
+  margin-top: 0.25rem;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--pine);
+}
+
+.pool-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--pine);
+}
+
+.pool-check small {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--ink-2);
+  font-size: 0.82rem;
+  line-height: 1.38;
+}
+
+.estimate-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--ink-2);
+}
+
+.estimate-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 0.45rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid var(--line-strong);
+}
+
+/* Contraofertas, Pool y Trazabilidad en RequestCard */
+.counteroffer-callout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem 1rem;
+  background: var(--marigold-soft);
+  border: 1px solid #ecce86;
+  border-radius: var(--r-md);
+  color: var(--ink);
+}
+
+.counteroffer-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--cacao);
+}
+
+.counteroffer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.5rem;
+  font-size: 0.93rem;
+}
+
+.counteroffer-notes {
+  font-style: italic;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+
+.pool-pill-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 0.95rem;
+  background: var(--sage-light);
+  border: 1px solid var(--sage);
+  border-radius: var(--r-md);
+  color: var(--pine);
+  font-size: 0.9rem;
+}
+
+.tracking-box {
+  padding: 1rem 1.1rem;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
+
+.tracking-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--pine);
+}
+
+.tracking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  list-style: none;
+}
+
+.tracking-item {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.tracking-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--pine);
+  color: var(--cream);
+}
+
+.tracking-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tracking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.tracking-header time {
+  font-size: 0.82rem;
+  color: var(--ink-3);
+}
+
+.tracking-content p {
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+
+.tracking-evidence {
+  margin-top: 0.4rem;
+  max-width: 280px;
+  overflow: hidden;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+}
+
+.tracking-evidence img {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+}
+
+/* Página Red Logística y Pools (/logistica) */
+.logistics-simulator {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-1);
+}
+
+.simulator-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 200px;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.quote-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1.2rem;
+}
+
+.quote-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  background: var(--cream);
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-lg);
+}
+
+.quote-card.is-optimal {
+  background: var(--sage-light);
+  border-color: var(--pine);
+}
+
+.quote-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.quote-price {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--pine);
+  line-height: 1;
+}
+
+.quote-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.7rem 0;
+  border-block: 1px solid var(--line);
+}
+
+.quote-metrics dt {
+  font-size: 0.78rem;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+.quote-metrics dd {
+  margin: 0.1rem 0 0;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.quote-legs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  list-style: none;
+  font-size: 0.86rem;
+  color: var(--ink-2);
+}
+
+.quote-legs li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.section-block {
+  margin-top: 3.25rem;
+}
+
+.pools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.pool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.35rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.pool-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pool-code {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.pool-sub {
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+
+.pool-meter {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--cream-deep);
+  overflow: hidden;
+}
+
+.pool-meter-fill {
+  height: 100%;
+  background: var(--moss);
+  border-radius: 999px;
+}
+
+.pool-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.86rem;
+  color: var(--ink-2);
+}
+
+.pool-Simulation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--sage-light);
+  border-radius: var(--r-md);
+  font-size: 0.86rem;
+  color: var(--pine);
+}
+
+.nodes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.node-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.1rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.node-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: var(--r-md);
+  background: var(--sage);
+  color: var(--pine);
+}
+
+.node-card p {
+  margin: 0.15rem 0 0.35rem;
+  font-size: 0.88rem;
+  color: var(--ink-3);
+}
+
+@media (max-width: 900px) {
+  .simulator-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ---------- Capa de Innovación: Mapa Geoespacial, Hidrología, Precio Justo, Voz Rural y Escrow ---------- */
+.pill-eco {
+  background: #d8ebd0;
+  color: #1f5328;
+}
+
+.simulator-controls.is-five {
+  grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+}
+
+.hydro-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.2rem;
+  border-radius: var(--r-md);
+  background: var(--marigold-soft);
+  border: 1px solid #ecce86;
+  color: #5f4003;
+  font-size: 0.92rem;
+}
+
+.corridor-map-card {
+  margin-bottom: 1.6rem;
+  padding: 1.2rem 1.3rem;
+  background: var(--paper);
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-1);
+}
+
+.corridor-map-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.95rem;
+}
+
+.corridor-map-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.river-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.river-live-pill.is-normal {
+  background: #dcebf1;
+  color: #165882;
+}
+
+.river-live-pill.is-drought {
+  background: var(--marigold-soft);
+  color: #6d4b05;
+}
+
+.river-live-pill.is-flood {
+  background: #d0e2f2;
+  color: #0f3f61;
+}
+
+.map-action-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.map-click-mode {
+  display: inline-flex;
+  padding: 0.22rem;
+  background: var(--cream);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+}
+
+.mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 0.83rem;
+  font-weight: 700;
+}
+
+.mode-pill.is-active {
+  background: var(--pine);
+  color: var(--cream);
+}
+
+.dot-origin,
+.dot-dest {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.dot-origin {
+  background: #2f855a;
+  border: 1.5px solid #fffdf6;
+}
+
+.dot-dest {
+  background: var(--danger);
+  border: 1.5px solid #fffdf6;
+}
+
+.corridor-canvas-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+}
+
+.corridor-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.map-dept-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  fill: #6f7f67;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.map-altitude-note {
+  font-size: 10.5px;
+  font-weight: 600;
+  fill: var(--ink-3);
+  pointer-events: none;
+}
+
+.compass-n {
+  font-size: 9px;
+  font-weight: 800;
+  fill: var(--pine);
+}
+
+.river-flow-line {
+  animation: river-drift 18s linear infinite;
+}
+
+.route-animated-dash {
+  animation: dash-move 1.2s linear infinite;
+}
+
+.pool-pulse {
+  animation: soft-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes river-drift {
+  to {
+    stroke-dashoffset: -120;
+  }
+}
+
+@keyframes dash-move {
+  to {
+    stroke-dashoffset: -17;
+  }
+}
+
+@keyframes soft-pulse {
+  0%, 100% {
+    opacity: 0.24;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.map-pool-chip-text {
+  font-size: 10.5px;
+  font-weight: 800;
+  fill: var(--pine-deep);
+  pointer-events: none;
+}
+
+.step-pill-label {
+  font-size: 10px;
+  font-weight: 700;
+  fill: #fffdf6;
+  pointer-events: none;
+}
+
+.node-inner-letter {
+  font-size: 9.5px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.map-node {
+  cursor: pointer;
+}
+
+.map-node-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: #fffdf6;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.map-node-label.is-origin-label {
+  font-size: 13px;
+  font-weight: 800;
+  fill: var(--pine-deep);
+}
+
+.map-node-label.is-dest-label {
+  font-size: 13px;
+  font-weight: 800;
+  fill: var(--danger);
+}
+
+.map-node-label.is-transfer-label {
+  font-weight: 800;
+  fill: #6d4b05;
+}
+
+.map-hover-card {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  padding: 0.65rem 0.9rem;
+  background: rgba(255, 253, 246, 0.96);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-1);
+  pointer-events: none;
+}
+
+.map-hover-card strong {
+  color: var(--pine);
+  font-size: 0.95rem;
+}
+
+.map-hover-card span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.map-hover-card small {
+  font-size: 0.76rem;
+  color: var(--ink-3);
+}
+
+.corridor-map-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line);
+}
+
+.map-legend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 20px;
+  height: 4px;
+  border-radius: 999px;
+}
+
+.legend-line.is-river {
+  background: #0e6ba0;
+}
+
+.legend-line.is-road {
+  background: var(--pine);
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.legend-dot.is-transfer {
+  background: var(--marigold);
+  border: 1.5px solid var(--pine);
+}
+
+.legend-dot.is-pool {
+  background: #fffdf6;
+  border: 2px solid var(--marigold);
+}
+
+.active-corridor-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.4rem 0.85rem;
+  background: var(--sage-light);
+  border-radius: 999px;
+  font-size: 0.84rem;
+  color: var(--pine);
+}
+
+.strip-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.strip-summary {
+  font-weight: 700;
+}
+
+.co2-tag {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: #d8ebd0;
+  color: #1f5328;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.risk-alto {
+  color: var(--danger);
+}
+
+.risk-medio {
+  color: #8a5a00;
+}
+
+.risk-bajo {
+  color: #235a2c;
+}
+
+/* Asistente Rural por Voz/Texto y Precio Justo SIPSA */
+.rural-assistant {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+  padding: 1.15rem 1.35rem;
+  background: var(--sage-light);
+  border: 1.5px solid var(--moss);
+  border-radius: var(--r-lg);
+}
+
+.rural-assistant-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  color: var(--pine);
+}
+
+.rural-assistant-head p {
+  margin-top: 0.15rem;
+  font-size: 0.88rem;
+  color: var(--ink-2);
+}
+
+.rural-assistant-row {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.rural-assistant-row .control {
+  flex: 1 1 320px;
+}
+
+.fair-price-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.15rem;
+  background: var(--paper);
+  border: 1.5px solid var(--moss);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.fair-price-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--pine);
+}
+
+.fair-price-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.6rem 0;
+  border-block: 1px solid var(--line);
+  font-size: 0.87rem;
+}
+
+.fair-price-rows > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.fair-price-rows dt {
+  color: var(--ink-3);
+}
+
+.fair-price-rows dd {
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.fair-gain-pill {
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--r-sm);
+  background: #d8ebd0;
+  color: #1f5328;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.fair-advice {
+  font-size: 0.84rem;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+
+/* Barra de Pago Protegido Escrow */
+.escrow-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem 1rem;
+  background: #eef5ef;
+  border: 1px solid #bdd5c0;
+  border-radius: var(--r-md);
+}
+
+.escrow-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+
+.escrow-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  color: var(--pine);
+}
+
+.pool-meter-fill.is-escrow {
+  background: var(--pine);
+}
+
+.escrow-box small {
+  color: var(--ink-2);
+  font-size: 0.82rem;
+}
+
+
+/* ---------- Pulido Ejecutivo: Inicio, Acceso Rápido Demo, Filtros de Precio y Detalles de Mapa ---------- */
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: var(--sage-light);
+  color: var(--pine);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.hero-metrics {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.35rem 0 0;
+}
+
+.hero-metrics > div {
+  padding: 1rem 1.2rem;
+  background: rgba(255, 253, 246, 0.1);
+  border: 1px solid rgba(255, 253, 246, 0.2);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(8px);
+}
+
+.hero-metrics dt {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #cddcc0;
+}
+
+.hero-metrics dd {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--cream);
+  line-height: 1.1;
+}
+
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+  gap: 1.2rem;
+}
+
+.pillar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.4rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.pillar-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: var(--sage-light);
+  color: var(--pine);
+}
+
+.pillar-card p {
+  color: var(--ink-3);
+  font-size: 0.94rem;
+}
+
+/* Acceso rápido demo en Login */
+.demo-access-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  padding: 0.9rem 1rem;
+  background: var(--sage-light);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+}
+
+.demo-access-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--pine);
+}
+
+.demo-access-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Rango de precios en Catálogo */
+.price-filter-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(125px, 155px));
+  gap: 0.6rem;
+}
+
+.price-filter-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+/* Transparencia de Precio Directo en Detalle */
+.fair-detail-banner {
+  margin-top: 1.5rem;
+  padding: 1.15rem 1.3rem;
+  background: var(--sage-light);
+  border: 1px solid var(--moss);
+  border-radius: var(--r-lg);
+}
+
+.fair-detail-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--pine);
+  margin-bottom: 0.75rem;
+}
+
+.fair-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--paper);
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+}
+
+.fair-detail-grid span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ink-3);
+}
+
+.fair-detail-grid strong {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 1.02rem;
+  color: var(--ink);
+}
+
+.fair-detail-grid .is-highlight-price {
+  color: var(--pine);
+}
+
+.fair-detail-foot {
+  margin-top: 0.65rem;
+  font-size: 0.88rem;
+  color: var(--ink-2);
+}
+
+/* Interacciones de tarjetas logísticas e itinerario */
+.quote-card.is-interactive {
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.quote-card.is-interactive:hover {
+  border-color: var(--pine);
+  transform: translateY(-2px);
+}
+
+.quote-card-select-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--line-strong);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--pine);
+}
+
+.pool-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
+
+.itinerary-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  font-size: 0.84rem;
+  color: var(--ink);
+}
+
+.itinerary-leg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.itinerary-arrow {
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.77rem;
+  font-weight: 700;
+}
+
+.itinerary-arrow.is-fluvial {
+  background: #dcebf1;
+  color: #0e6ba0;
+}
+
+.itinerary-arrow.is-terrestre {
+  background: var(--sage);
+  color: var(--pine);
+}
+
+@media (max-width: 900px) {
+  .hero-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fair-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .price-filter-group {
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+}
